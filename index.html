@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Daily Games Checklist</title>
+</head>
+<body style="font-family: Verdana, sans-serif;">
+
+    <h1>Daily Games Checklist</h1>
+    <p id="date"></p>
+    <p id="progress"></p>
+
+    <ul id="game-list"></ul>
+
+    <button onclick="resetAll()" style="font-family: Verdana, sans-serif;">Reset All</button>
+
+    <script>
+   const games = [
+  { id: "wordle", name: "Wordle", url: "https://www.nytimes.com/games/wordle/index.html" },
+  { id: "globle", name: "Globle", url: "https://globle-game.com/" },
+  { id: "worldle", name: "Worldle", url: "https://worldle.teuteuf.fr/" },
+  { id: "sizeitup", name: "Size It Up", url: "https://sizeitup.game/" },
+  { id: "krillion", name: "Krillion", url: "https://krillion.fun/" },
+  { id: "rngdle", name: "Rngdle", url: "https://www.rngdle.com/" },
+  { id: "connections", name: "NYT Connections", url: "https://www.nytimes.com/games/connections" },
+  { id: "poople", name: "Poople", url: "https://pooplegame.com/" },
+  { id: "contexto", name: "Contexto", url: "https://contexto.me/" },
+  { id: "pokedoku", name: "Pokedoku", url: "https://pokedoku.com/" },
+  { id: "craftingbee", name: "Crafting Bee", url: "https://www.mcdle.net/crafting_bee/daily" }
+];
+
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById("date").textContent = "Date: " + today;
+
+    if (localStorage.getItem("games_date") !== today) {
+      localStorage.setItem("games_date", today);
+      localStorage.removeItem("games_completed");
+    }
+
+    let completed = JSON.parse(localStorage.getItem("games_completed")) || [];
+
+    function render() {
+      const list = document.getElementById("game-list");
+      list.innerHTML = "";
+
+      games.forEach(game => {
+        const isChecked = completed.includes(game.id);
+        const li = document.createElement("li");
+
+        li.innerHTML = `
+          <label>
+            <input type="checkbox" ${isChecked ? "checked" : ""} onchange="toggle('${game.id}')">
+            <a href="${game.url}" target="_blank">${game.name}</a>
+          </label>
+        `;
+        list.appendChild(li);
+      });
+
+      document.getElementById("progress").textContent =
+        `Completed: ${completed.length} / ${games.length}`;
+    }
+
+    function toggle(id) {
+      if (completed.includes(id)) {
+        completed = completed.filter(item => item !== id);
+      } else {
+        completed.push(id);
+      }
+      localStorage.setItem("games_completed", JSON.stringify(completed));
+      render();
+    }
+
+    function resetAll() {
+      completed = [];
+      localStorage.setItem("games_completed", JSON.stringify(completed));
+      render();
+    }
+
+    render();
+    </script>
+
+</body>
+</html>
